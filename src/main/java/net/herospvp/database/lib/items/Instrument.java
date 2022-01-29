@@ -1,16 +1,14 @@
 package net.herospvp.database.lib.items;
 
-import lombok.SneakyThrows;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
+import lombok.SneakyThrows;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("unused")
@@ -77,27 +75,11 @@ public class Instrument {
     }
 
     @SneakyThrows
-    public <G> void close(G generic) {
-        if (generic instanceof PreparedStatement) {
-            ((PreparedStatement) generic).close();
-        }
-        else if (generic instanceof Connection) {
-            ((Connection) generic).close();
-        }
-        else if (generic instanceof ResultSet) {
-            ((ResultSet) generic).close();
-        }
+    public <G extends AutoCloseable> void close(G generic) {
+        generic.close();
     }
 
-    public <G> void close(G generic, G generic1) {
-        close(generic);
-        close(generic1);
+    public <G extends AutoCloseable> void close(List<G> closeables) {
+        closeables.forEach(this::close);
     }
-
-    public <G> void close(G generic, G generic1, G generic2) {
-        close(generic);
-        close(generic1);
-        close(generic2);
-    }
-
 }
